@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Requests\Accounts;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class FiscalYearRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'FiscalYearId' => 'nullable|integer|exists:accounts_closing,FiscalYearId',
+            'OpeningDate' => 'required|date',
+            'ClosingDate' => 'required|date|after:OpeningDate',
+            'Remarks' => 'nullable|string|max:500',
+        ];
+    }
+}

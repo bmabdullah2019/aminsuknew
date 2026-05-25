@@ -1,0 +1,6 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+parameters:
+    paths:
+        - app
+    level: 5 # ০ থেকে ৯ পর্যন্ত হয়, ৫ হলো স্ট্যান্ডার্ড

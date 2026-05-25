@@ -1,0 +1,399 @@
+.bulkselect {
+    border: 1px solid #ddd;
+    padding: 2px 0px;
+    margin-right: 5px;
+    margin-bottom: 14px;
+    outline: 0;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #0f52cd !important;
+    border: 1px solid #0f52cd !important;
+}
+.select2-selection__rendered,.select2-selection--single{
+    height: 38px !important;
+    line-height: 29px !important;
+}
+.select2-selection--multiple {
+    max-height: auto !important;
+    line-height: 29px !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff !important;
+}
+.control-group.input-group {
+    margin: 8px 0;
+}
+.backend-image{
+    height: 50px;
+    width: 50px;
+    border-radius: 50px;
+}
+.edit-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    margin-top: 5px;
+    background: #f1f1f1;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 58px;
+  height: 32px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 25px;
+  width: 25px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+.custom-drop a {
+    background: transparent;
+    padding: 0;
+    margin: 5px 0;
+}
+.custom-drop button {
+    width: 100%;
+    padding: 5px;
+    border: 0;
+    background: #F3F7F9;
+    text-align: center;
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+ul.nav-second-level svg {
+    height: 14px;
+}
+.custom-btn-list button {
+    background: transparent;
+    border: 0;
+}
+
+.custom-btn-list button i, .custom-btn-list a i {
+    color: #444;
+    font-size: 16px;
+}
+.button-list.custom-btn-list a, .button-list.custom-btn-list button {
+    margin: 3px 5px;
+    padding: 0;
+}
+.action2-btn {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;
+}
+.action2-btn li {
+    display: inline-block;
+    list-style: none;
+    margin: 2px 0;
+}
+.card-body thead {
+    background: #EEF2F7;
+}
+form.custom_form input, form.custom_form input:focus {
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 0 17px;
+    width: 70%;
+    outline: 0;
+}
+/*==== Pos css start == */
+.quantity button, .quantity input {
+    border: 0;
+}
+input.invdiscount {
+    height: 35px;
+    border-radius: 5px;
+}
+.qty-cart .quantity {
+    position: relative;
+    border: 1px solid #ddd;
+    height: 35px;
+    overflow: hidden;
+}
+.qty-cart input {
+    width: 100px !important;
+    text-align: center;
+}
+.pos_form input,.pos_form input:focus {
+    border: 1px solid #ddd !important;
+    padding: 8px;
+    width: 100% !important;
+    outline: 0 !important;
+}
+.quantity input {
+    position: relative;
+    text-align: center;
+    font-size: 16px;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    font-weight: 500;
+}
+.quantity .minus {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 9;
+    height: 35px;
+    line-height: 35px;
+    width: 35px;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    font-size: 40px;
+    cursor: pointer;
+}
+.quantity .plus {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 9;
+    height: 35px;
+    line-height: 35px;
+    width: 35px;
+    border-left: 1px solid #ddd;
+    text-align: center;
+    font-size: 26px;
+    cursor: pointer;
+}
+ul#side-menu li {
+    border-bottom: 1px solid #ddd;
+}
+@media only screen and (min-width:320px) and (max-width:767px) {
+    form.custom_form {
+        margin-bottom: 15px;
+    }
+    .action2-btn a, .action2-btn button {
+        padding: 3px 12px;
+    }
+}
+
+/* Sticky Table Styles for Reports */
+.report-sticky-container {
+    max-height: 70vh;
+    overflow: auto;
+    position: relative;
+    border: 1px solid #dee2e6;
+}
+
+.report-sticky-container table {
+    margin-bottom: 0 !important;
+}
+
+.report-sticky-container thead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.report-sticky-container thead th {
+    background-color: #f8f9fa !important;
+    box-shadow: inset 0 -1px 0 #dee2e6;
+}
+
+.report-sticky-container tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+}
+
+.report-sticky-container tfoot th,
+.report-sticky-container tfoot td {
+    background-color: #f8f9fa !important;
+    box-shadow: inset 0 1px 0 #dee2e6;
+}
+
+/* Ensure background is opaque for sticky elements */
+.report-sticky-container table thead th,
+.report-sticky-container table tfoot th,
+.report-sticky-container table tfoot td {
+    background-clip: padding-box;
+}
+
+/* ===========================================================
+   Admin UI: Force square buttons (no border-radius)
+   Scoped to backend shell to avoid front-end/card/input changes
+   =========================================================== */
+.wc-admin-shell {
+    /* Generic button elements */
+    button,
+    .btn,
+    a.btn,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"] {
+        border-radius: 0 !important;
+    }
+
+    /* Bootstrap-like groups / dropdown toggles */
+    .btn-group .btn,
+    .btn-group > .dropdown-toggle,
+    .dropdown-toggle,
+    .dropdown-menu .btn,
+    .dropdown-menu .dropdown-item {
+        border-radius: 0 !important;
+    }
+
+    /* Pagination (bootstrap / custom) */
+    .pagination .page-link,
+    .pagination .page-item > .page-link,
+    .pagination .btn,
+    .dataTables_paginate .page-link,
+    .dataTables_paginate .btn,
+    ul.pagination li a,
+    ul.pagination li span {
+        border-radius: 0 !important;
+    }
+
+    /* DataTables (plugin generated) */
+    .dataTables_wrapper .dt-buttons button,
+    .dataTables_wrapper .dt-buttons a,
+    .dataTables_wrapper .dt-paging-button,
+    table.dataTable .dt-buttons button {
+        border-radius: 0 !important;
+    }
+
+    /* Remove radius from utility classes ONLY when they are used on button-like elements */
+    button.rounded,
+    button[class*=' rounded-'],
+    button.rounded-pill,
+    button.rounded-circle,
+    a.btn.rounded,
+    a.btn[class*=' rounded-'],
+    a.btn.rounded-pill,
+    a.btn.rounded-circle,
+    .btn.rounded,
+    .btn[class*=' rounded-'],
+    .btn.rounded-pill,
+    .btn.rounded-circle,
+    .btn-rounded,
+    .btn-radius,
+    .btn-round {
+        border-radius: 0 !important;
+    }
+
+    /* Hover/focus/active/disabled states: keep same visuals, only radius */
+    button:focus,
+    button:focus-visible,
+    button:hover,
+    button:active,
+    button:disabled,
+    .btn:focus,
+    .btn:focus-visible,
+    .btn:hover,
+    .btn:active,
+    .btn:disabled,
+    .dropdown-toggle:focus,
+    .dropdown-toggle:hover {
+        border-radius: 0 !important;
+    }
+
+    /* Sidebar toggle buttons (class-based) */
+    .button-menu-mobile,
+    .right-bar-toggle,
+    .nav-link.dropdown-toggle,
+    #sidebar-menu-search-clear {
+        border-radius: 0 !important;
+    }
+}
+
+/* ===========================================================
+   Global Print / PDF Styles
+   =========================================================== */
+@media print {
+    .left-side-menu,
+    .navbar-custom,
+    .right-bar,
+    .rightbar-overlay,
+    .no-print,
+    .page-title-box .no-print,
+    .card.no-print,
+    .custom_paginate,
+    .pagination,
+    footer {
+        display: none !important;
+    }
+
+    body,
+    .wrapper,
+    .content-page,
+    .content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .content-page {
+        margin-left: 0 !important;
+    }
+
+    .report-sticky-container {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .report-sticky-container thead,
+    .report-sticky-container tfoot {
+        position: relative !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    table {
+        font-size: 11px !important;
+    }
+
+    a[href]:after {
+        content: none !important;
+    }
+}
