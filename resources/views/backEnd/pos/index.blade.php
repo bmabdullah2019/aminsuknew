@@ -121,9 +121,9 @@
             </div>
             <div class="col-6">
               <select id="pos-delivery-area" class="form-control" onchange="updateShippingFee()">
-                <option value="" data-amount="0">Select Delivery Area</option>
+                <option value="" data-amount="0" data-charge-id="">Select Delivery Area</option>
                 @foreach($shippingCharges as $charge)
-                  <option value="{{ $charge->name }}" data-amount="{{ $charge->amount }}">{{ $charge->name }}</option>
+                  <option value="{{ $charge->name }}" data-amount="{{ $charge->amount }}" data-charge-id="{{ $charge->id }}">{{ $charge->name }}</option>
                 @endforeach
               </select>
             </div>
@@ -134,8 +134,8 @@
             <span>Sub Total</span>
             <span class="currency" id="pos-subtotal">৳0</span>
           </div>
-          <div class="pos-summary-row">
-            <span>Shipping Fee</span>
+          <div class="pos-summary-row" id="pos-shipping-row">
+            <span id="pos-shipping-label">Shipping Fee</span>
             <span><input type="number" id="pos-shipping" value="0" min="0" style="width:70px;text-align:right;border:1px solid var(--pos-border);border-radius:4px;font-size:.82rem;padding:2px 6px"></span>
           </div>
           <div class="pos-summary-row">
@@ -251,6 +251,9 @@
       });
     }
     renderCart();
+    // Re-calculate shipping if area already selected
+    var sel = document.getElementById('pos-delivery-area');
+    if (sel && sel.selectedIndex > 0) updateShippingFee();
   }
 
   // Render cart
@@ -327,14 +330,60 @@
   document.getElementById('pos-shipping').addEventListener('input', updateTotals);
   document.getElementById('pos-discount').addEventListener('input', updateTotals);
 
+  var posCalcShippingUrl = @json(route('admin.pos.calculate-shipping'));
+
   window.updateShippingFee = function() {
     var select = document.getElementById('pos-delivery-area');
-    var amount = 0;
-    if (select.selectedIndex > 0) {
-      amount = select.options[select.selectedIndex].getAttribute('data-amount');
+    if (select.selectedIndex <= 0) {
+      document.getElementById('pos-shipping').value = 0;
+      document.getElementById('pos-shipping-label').textContent = 'Shipping Fee';
+      document.getElementById('pos-shipping').style.display = '';
+      updateTotals();
+      return;
     }
-    document.getElementById('pos-shipping').value = amount;
-    updateTotals();
+    var chargeId = select.options[select.selectedIndex].getAttribute('data-charge-id');
+    var fallbackAmount = parseFloat(select.options[select.selectedIndex].getAttribute('data-amount')) || 0;
+
+    if (!chargeId || !cart.length) {
+      document.getElementById('pos-shipping').value = fallbackAmount;
+      document.getElementById('pos-shipping').style.display = '';
+      updateTotals();
+      return;
+    }
+
+    var items = cart.map(function(c) {
+      return {product_id: c.product_id, qty: c.qty, price: c.price};
+    });
+    var discount = parseFloat(document.getElementById('pos-discount').value) || 0;
+
+    fetch(posCalcShippingUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-CSRF-TOKEN':csrfToken,'Accept':'application/json'},
+      body: JSON.stringify({items: items, shipping_charge_id: chargeId, discount: discount})
+    })
+    .then(function(r){return r.json();})
+    .then(function(res) {
+      if (res.success) {
+        document.getElementById('pos-shipping').value = res.shipping_major;
+        var label = document.getElementById('pos-shipping-label');
+        var shippingInput = document.getElementById('pos-shipping');
+        if (res.is_weight_based) {
+          label.textContent = 'Shipping (weight)';
+          shippingInput.style.display = 'none';
+          label.title = 'BDT ' + res.shipping_major + ' (included in total)';
+        } else {
+          label.textContent = 'Shipping Fee';
+          shippingInput.style.display = '';
+          label.title = '';
+        }
+        updateTotals();
+      }
+    })
+    .catch(function() {
+      document.getElementById('pos-shipping').value = fallbackAmount;
+      document.getElementById('pos-shipping').style.display = '';
+      updateTotals();
+    });
   };
 
   // Customer search

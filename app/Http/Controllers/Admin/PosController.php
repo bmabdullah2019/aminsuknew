@@ -118,6 +118,64 @@ class PosController extends Controller
     }
 
     /**
+     * AJAX: Calculate shipping for the current POS cart.
+     * Returns is_weight_based, shipping_major, subtotal_major, grand_total_major.
+     */
+    public function calculateShipping(Request $request)
+    {
+        $request->validate([
+            'items'              => 'required|array|min:1',
+            'items.*.product_id' => 'required|integer|exists:products,id',
+            'items.*.qty'        => 'required|integer|min:1',
+            'items.*.price'      => 'required|numeric|min:0',
+            'shipping_charge_id' => 'required|integer|exists:shipping_charges,id',
+            'discount'           => 'nullable|numeric|min:0',
+        ]);
+
+        $items   = $request->input('items', []);
+        $chargeId = (int) $request->input('shipping_charge_id');
+        $discount = (float) $request->input('discount', 0);
+
+        // Build a lightweight Eloquent-like collection that ShippingService accepts
+        $cartItems = collect($items)->map(function ($item) {
+            return (object) [
+                'id'    => (int) $item['product_id'],
+                'qty'   => (int) $item['qty'],
+                'price' => (float) $item['price'],
+            ];
+        });
+
+        $shippingService = app(\App\Services\ShippingService::class);
+        $isWeightBased   = $shippingService->isCartWeightBased($cartItems);
+        $shippingMinor   = $shippingService->calculateForCart($cartItems, $chargeId) ?? 0;
+
+        // Fallback to fixed charge amount if engine returned null (all-legacy products)
+        if ($shippingMinor === 0 && ! $isWeightBased) {
+            $charge = \App\Models\ShippingCharge::where('id', $chargeId)
+                ->where('status', 1)
+                ->first(['amount', 'amount_minor']);
+            if ($charge) {
+                $shippingMinor = (int) ($charge->amount_minor ?? round($charge->amount * 100));
+            }
+        }
+
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += (float) $item['price'] * (int) $item['qty'];
+        }
+
+        $grandTotal = max(0, $subtotal + ($shippingMinor / 100) - $discount);
+
+        return response()->json([
+            'success'         => true,
+            'is_weight_based' => $isWeightBased,
+            'shipping_major'  => round($shippingMinor / 100, 2),
+            'subtotal_major'  => round($subtotal, 2),
+            'grand_total_major' => round($grandTotal, 2),
+        ]);
+    }
+
+    /**
      * AJAX: Complete a POS sale.
      */
     public function completeSale(Request $request)

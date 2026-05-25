@@ -206,6 +206,7 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::get('pos/products', [PosController::class, 'getProducts'])->name('pos.products');
     Route::get('pos/customers', [PosController::class, 'searchCustomers'])->name('pos.customers');
     Route::post('pos/complete-sale', [PosController::class, 'completeSale'])->name('pos.complete-sale');
+    Route::post('pos/calculate-shipping', [PosController::class, 'calculateShipping'])->name('pos.calculate-shipping');
 
     // users route
     Route::get('users/manage', [UserController::class, 'index'])->name('users.index');

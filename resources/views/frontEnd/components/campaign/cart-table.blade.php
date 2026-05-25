@@ -142,13 +142,21 @@
         <tr>
             <th colspan="2" class="text-end px-4">ডেলিভারি চার্জ</th>
             <td>
-                <span id="cart_shipping_cost"><span class="alinur">৳ </span><strong>{{ $shipping }}</strong></span>
+                @if($isWeightBased)
+                    <span id="cart_shipping_cost" class="text-muted" style="font-size:.82rem">এলাকা অনুযায়ী</span>
+                @else
+                    <span id="cart_shipping_cost"><span class="alinur">৳ </span><strong>{{ $shipping }}</strong></span>
+                @endif
             </td>
         </tr>
         <tr>
             <th colspan="2" class="text-end px-4">সর্বমোট</th>
             <td>
-                <span id="grand_total"><span class="alinur">৳ </span><strong>{{ $subtotal + $shipping }}</strong></span>
+                @if($isWeightBased)
+                    <span id="grand_total"><span class="alinur">৳ </span><strong id="cart-grand-total-val">{{ $subtotal }}</strong></span>
+                @else
+                    <span id="grand_total"><span class="alinur">৳ </span><strong id="cart-grand-total-val">{{ $subtotal + $shipping }}</strong></span>
+                @endif
             </td>
         </tr>
     </tfoot>

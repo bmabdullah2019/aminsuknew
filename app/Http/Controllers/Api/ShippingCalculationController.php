@@ -33,6 +33,7 @@ class ShippingCalculationController extends Controller
             'final_minor' => (int) $totals['final_minor'],
             'currency' => $totals['currency'],
             'shipping_charge_id' => (int) $totals['shipping_charge_id'],
+            'is_weight_based' => (bool) ($totals['is_weight_based'] ?? false),
         ]);
     }
 }

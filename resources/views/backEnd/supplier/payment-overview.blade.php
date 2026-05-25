@@ -3,7 +3,7 @@
 
 @section('css')
 <style>
-    .procure-modal .modal-dialog{max-width:640px}.procure-modal .modal-content{border:0;border-radius:10px;overflow:visible}.procure-modal .modal-header{border-bottom:2px solid #f15a24;padding:.9rem 1.2rem}.procure-modal .modal-footer{background:#edf3fb;border-top:1px solid #d7e2ef}.procure-modal{background:rgba(15,23,42,.38)}.procure-box{border:1px solid #dfe6ef;background:#fff}.procure-box .card-body{padding:1rem}
+    .procure-modal .modal-dialog{max-width:480px}.procure-modal .modal-content{border:0;border-radius:6px;overflow:visible}.procure-modal .modal-header{border-bottom:3px solid #f15a24;padding:.85rem 1.25rem}.procure-modal .modal-footer{background:#fff;border-top:1px solid #e9ecef;padding:.75rem 1.25rem}.procure-modal{background:rgba(15,23,42,.38)}.procure-box{border:1px solid #dfe6ef;background:#fff}.procure-box .card-body{padding:1rem}.pay-modal-row{display:flex;align-items:center;margin-bottom:.85rem}.pay-modal-row label{width:140px;min-width:140px;font-size:.875rem;color:#444;margin:0}.pay-modal-row .pay-ctrl{flex:1}.pay-through-select{border-color:#f15a24!important;outline:none}.pay-through-select:focus{border-color:#f15a24!important;box-shadow:0 0 0 .15rem rgba(241,90,36,.2)}.btn-save-pay{background:#5b9bd5;color:#fff;border:0;min-width:80px}.btn-save-pay:hover,.btn-save-pay:focus{background:#4a8ac4;color:#fff}
 </style>
 @endsection
 
@@ -131,72 +131,95 @@
             </div>
             <form id="paymentForm">
                 @csrf
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Supplier</label>
-                            <select id="paymentSupplierId" class="form-select">
+                <div class="modal-body" style="padding:1.1rem 1.4rem">
+
+                    <div class="pay-modal-row">
+                        <label>Supplier</label>
+                        <div class="pay-ctrl">
+                            <select id="paymentSupplierId" class="form-select form-select-sm">
                                 <option value="">Select Supplier</option>
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}">{{ $supplier->supplier_code }} - {{ $supplier->name }}</option>
+                                @foreach($suppliers as $s)
+                                    <option value="{{ $s->id }}">{{ $s->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payment Date</label>
-                            <input type="date" id="paymentDate" class="form-control" value="{{ date('Y-m-d') }}">
+                    </div>
+
+                    <div class="pay-modal-row">
+                        <label>Payment Date</label>
+                        <div class="pay-ctrl">
+                            <input type="date" id="paymentDate" class="form-control form-control-sm" value="{{ date('Y-m-d') }}">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payment Through</label>
-                            <select id="paymentBranchId" class="form-select">
-                                <option value="">Select</option>
-                                @foreach($branches as $branch)
-                                    <option value="{{ $branch->id }}">{{ $branch->code }} - {{ $branch->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Accounts Head</label>
-                            <select id="paymentAccountHeadId" class="form-select">
-                                <option value="">Select Accounts Head</option>
-                                @foreach(($accountHeads ?? collect()) as $head)
-                                    <option value="{{ $head->HeadId }}">{{ $head->HeadCode }} - {{ $head->HeadName }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label d-block">Payment Type</label>
-                            <div class="form-check form-check-inline">
+                    </div>
+
+                    <div class="pay-modal-row">
+                        <label>Payment Type</label>
+                        <div class="pay-ctrl d-flex gap-3">
+                            <div class="form-check mb-0">
                                 <input class="form-check-input" type="radio" name="payment_method_ui" id="payCash" value="cash" checked>
                                 <label class="form-check-label" for="payCash">Cash</label>
                             </div>
-                            <div class="form-check form-check-inline">
+                            <div class="form-check mb-0">
                                 <input class="form-check-input" type="radio" name="payment_method_ui" id="payCheque" value="cheque">
                                 <label class="form-check-label" for="payCheque">Cheque</label>
                             </div>
                         </div>
-                        <div class="col-md-6 payment-cheque-only d-none">
-                            <label class="form-label">Bank Name</label>
-                            <input type="text" id="paymentBankName" class="form-control">
-                        </div>
-                        <div class="col-md-6 payment-cheque-only d-none">
-                            <label class="form-label">Cheque No</label>
-                            <input type="text" id="paymentReference" class="form-control">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Payment Amount</label>
-                            <input type="number" id="paymentAmount" class="form-control" min="0.01" step="0.01" placeholder="Payment Amount">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Remarks</label>
-                            <textarea id="paymentNotes" rows="2" class="form-control" placeholder="Remarks"></textarea>
+                    </div>
+
+                    <div class="pay-modal-row">
+                        <label>Payment Through</label>
+                        <div class="pay-ctrl">
+                            <select id="paymentThrough" class="form-select form-select-sm pay-through-select">
+                                <option value="">Select</option>
+                                <option value="cash|0">Cash</option>
+                                @foreach($branches as $b)
+                                    <option value="cash|{{ $b->id }}">Cash at {{ $b->name }}</option>
+                                @endforeach
+                                <option value="iou|0">IOU Slip</option>
+                                @if(($accountHeads ?? collect())->count())
+                                <optgroup label="Bank">
+                                    @foreach($accountHeads as $head)
+                                        <option value="bank|{{ $head->HeadId }}">{{ $head->HeadName }}</option>
+                                    @endforeach
+                                </optgroup>
+                                @endif
+                            </select>
                         </div>
                     </div>
+
+                    <div class="pay-modal-row">
+                        <label>Payment Amount</label>
+                        <div class="pay-ctrl">
+                            <input type="number" id="paymentAmount" class="form-control form-control-sm" min="0.01" step="0.01" placeholder="Payment Amount">
+                        </div>
+                    </div>
+
+                    <div class="pay-modal-row payment-cheque-only d-none">
+                        <label>Cheque Date</label>
+                        <div class="pay-ctrl">
+                            <input type="date" id="paymentChequeDate" class="form-control form-control-sm">
+                        </div>
+                    </div>
+
+                    <div class="pay-modal-row payment-cheque-only d-none">
+                        <label>Cheque No</label>
+                        <div class="pay-ctrl">
+                            <input type="text" id="paymentReference" class="form-control form-control-sm" placeholder="Cheque Number">
+                        </div>
+                    </div>
+
+                    <div class="pay-modal-row mb-0">
+                        <label>Remarks</label>
+                        <div class="pay-ctrl">
+                            <input type="text" id="paymentNotes" class="form-control form-control-sm" placeholder="Remarks">
+                        </div>
+                    </div>
+
                     <div id="paymentMessage" class="mt-3 d-none"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-info text-white" id="btnSavePayment">Save</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-save-pay" id="btnSavePayment">Save</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </form>
         </div>
@@ -217,9 +240,8 @@ document.addEventListener('DOMContentLoaded', function () {
         form: document.getElementById('paymentForm'),
         supplierId: document.getElementById('paymentSupplierId'),
         date: document.getElementById('paymentDate'),
-        branchId: document.getElementById('paymentBranchId'),
-        accountHeadId: document.getElementById('paymentAccountHeadId'),
-        bankName: document.getElementById('paymentBankName'),
+        through: document.getElementById('paymentThrough'),
+        chequeDate: document.getElementById('paymentChequeDate'),
         reference: document.getElementById('paymentReference'),
         amount: document.getElementById('paymentAmount'),
         notes: document.getElementById('paymentNotes'),
@@ -229,6 +251,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function currentMethod() {
         return document.querySelector('input[name="payment_method_ui"]:checked')?.value || 'cash';
+    }
+    function parseThroughValue(val) {
+        if (!val) return { type: '', id: '' };
+        const parts = val.split('|');
+        return { type: parts[0] || '', id: parts[1] || '' };
     }
     function showModal() {
         modalOpen = true;
@@ -249,35 +276,12 @@ document.addEventListener('DOMContentLoaded', function () {
         chequeFields.forEach(function (field) {
             field.classList.toggle('d-none', !visible);
         });
-        const method = currentMethod();
-        
-        const currentBranch = el.branchId.value || 'global';
-        const activeMap = paymentHeadMapsByBranch[currentBranch] || paymentHeadMapsByBranch['global'] || {};
-        const mappingDetail = activeMap[method];
-        
-        if (el.accountHeadId && method && mappingDetail) {
-            el.accountHeadId.value = String(mappingDetail.head_id);
-            if (mappingDetail.is_locked) {
-                el.accountHeadId.classList.add('bg-light');
-                el.accountHeadId.style.pointerEvents = 'none';
-                el.accountHeadId.tabIndex = -1;
-            } else {
-                el.accountHeadId.classList.remove('bg-light');
-                el.accountHeadId.style.pointerEvents = 'auto';
-                el.accountHeadId.tabIndex = 0;
-            }
-        } else if (el.accountHeadId) {
-            el.accountHeadId.classList.remove('bg-light');
-            el.accountHeadId.style.pointerEvents = 'auto';
-            el.accountHeadId.tabIndex = 0;
-        }
     }
     function resetForm() {
         el.supplierId.value = '';
         el.date.value = new Date().toISOString().slice(0, 10);
-        el.branchId.value = '';
-        el.accountHeadId.value = '';
-        el.bankName.value = '';
+        el.through.value = '';
+        if (el.chequeDate) el.chequeDate.value = '';
         el.reference.value = '';
         el.amount.value = '';
         el.notes.value = '';
@@ -292,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
             el.message.textContent = '';
             return;
         }
-        el.message.className = `alert alert-${type} mt-3`;
+        el.message.className = 'alert alert-' + type + ' mt-3';
         el.message.textContent = message;
         el.message.classList.remove('d-none');
     }
@@ -304,9 +308,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('input[name="payment_method_ui"]').forEach(function (input) {
         input.addEventListener('change', toggleChequeFields);
     });
-    if (el.branchId) {
-        el.branchId.addEventListener('change', toggleChequeFields);
-    }
     modalElement.querySelectorAll('[data-bs-dismiss="modal"]').forEach(function (button) {
         button.addEventListener('click', hideModal);
     });
@@ -322,26 +323,45 @@ document.addEventListener('DOMContentLoaded', function () {
         setMessage('', 'success');
         el.save.disabled = true;
 
+        const method = currentMethod();
+        const through = parseThroughValue(el.through.value);
+
+        let paymentMethod = method;
+        let branchId = '';
+        let accountHeadId = '';
+
+        if (through.type === 'cash') {
+            paymentMethod = 'cash';
+            branchId = through.id;
+            const mapKey = through.id || 'global';
+            const activeMap = paymentHeadMapsByBranch[mapKey] || paymentHeadMapsByBranch['global'] || {};
+            const mapping = activeMap['cash'];
+            if (mapping) accountHeadId = mapping.head_id;
+        } else if (through.type === 'iou') {
+            paymentMethod = 'other';
+        } else if (through.type === 'bank') {
+            paymentMethod = method === 'cheque' ? 'cheque' : 'bank_transfer';
+            accountHeadId = through.id;
+        }
+
+        let notes = el.notes.value;
+        if (method === 'cheque' && el.chequeDate && el.chequeDate.value) {
+            notes = notes ? ('Cheque Date: ' + el.chequeDate.value + ' | ' + notes) : ('Cheque Date: ' + el.chequeDate.value);
+        }
+
         const formData = new FormData();
         formData.append('_token', csrfToken);
         formData.append('supplier_id', el.supplierId.value);
         formData.append('payment_date', el.date.value);
-        formData.append('branch_id', el.branchId.value);
-        
-        let headId = el.accountHeadId.value;
-        const method = currentMethod();
-        const currentBranch = el.branchId.value || 'global';
-        const activeMap = paymentHeadMapsByBranch[currentBranch] || paymentHeadMapsByBranch['global'] || {};
-        const mappingDetail = activeMap[method];
-        if (mappingDetail && mappingDetail.is_locked) {
-            headId = mappingDetail.head_id;
+        formData.append('branch_id', branchId);
+        formData.append('account_head_id', accountHeadId);
+        formData.append('payment_method', paymentMethod);
+        if (method === 'cheque') {
+            formData.append('cheque_number', el.reference.value);
+            formData.append('reference_number', el.reference.value);
         }
-        formData.append('account_head_id', headId);
-        formData.append('payment_method', currentMethod());
-        formData.append('bank_name', el.bankName.value);
-        formData.append('reference_number', el.reference.value);
         formData.append('amount', el.amount.value);
-        formData.append('notes', el.notes.value);
+        formData.append('notes', notes);
         formData.append('status', 'completed');
 
         fetch("{{ route('admin.supplier.payments.record') }}", {

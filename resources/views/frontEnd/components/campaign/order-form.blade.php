@@ -110,9 +110,21 @@
                                                 <div class="col-sm-12">
                                                     <div class="form-group mb-3">
                                                         <label for="area">শিপিং সিলেক্ট করুন *</label>
+                                                        @php
+                                                            $lpShipSvc  = app(\App\Services\ShippingService::class);
+                                                            $lpCart     = Cart::instance('shopping')->content();
+                                                            $lpIsWeight = $lpShipSvc->isCartWeightBased($lpCart);
+                                                            $lpSubtotal = $lpCart->sum(fn($i) => (float)$i->price * (int)$i->qty);
+                                                        @endphp
                                                         <select id="area" class="form-control @error('area') is-invalid @enderror" name="area" required>
                                                             @foreach($shippingcharge as $shipping)
-                                                            <option value="{{ $shipping->id }}">{{ $shipping->name }}</option>
+                                                            <option value="{{ $shipping->id }}" data-amount="{{ $shipping->amount }}">
+                                                                @if($lpIsWeight)
+                                                                    {{ $shipping->name }}
+                                                                @else
+                                                                    {{ $shipping->name }} - ৳{{ number_format((float)$shipping->amount, 0) }}
+                                                                @endif
+                                                            </option>
                                                             @endforeach
                                                         </select>
                                                         @error('area')
@@ -121,11 +133,76 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- Price Breakdown -->
+                                                <div class="col-sm-12">
+                                                    <div style="background:#f8f9fa;border-radius:6px;padding:12px 16px;font-size:.88rem;margin-bottom:12px">
+                                                        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                                                            <span>পণ্য মূল্য</span>
+                                                            <strong id="lp-subtotal">৳{{ number_format($lpSubtotal, 0) }}</strong>
+                                                        </div>
+                                                        <div style="display:flex;justify-content:space-between;margin-bottom:5px" id="lp-shipping-row">
+                                                            <span id="lp-shipping-label">ডেলিভারি চার্জ</span>
+                                                            <strong id="lp-shipping">৳0</strong>
+                                                        </div>
+                                                        <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #dee2e6">
+                                                            <strong>সর্বমোট</strong>
+                                                            <strong id="lp-total" style="color:#dc3545">৳{{ number_format($lpSubtotal, 0) }}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <div class="col-sm-12">
                                                     <div class="form-group">
                                                         <button class="order_place" type="submit">অর্ডার কন্ফার্ম করুন</button>
                                                     </div>
                                                 </div>
+
+                                                <script>
+                                                (function(){
+                                                    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                                                    var csrf = csrfMeta ? csrfMeta.content : '{{ csrf_token() }}';
+                                                    var calcUrl = '{{ route("api.shipping.calculate") }}';
+                                                    var areaEl  = document.getElementById('area');
+                                                    var isWB    = {{ $lpIsWeight ? 'true' : 'false' }};
+
+                                                    function fmt(v) {
+                                                        return '৳' + Math.round(parseFloat(v)).toLocaleString('en-BD');
+                                                    }
+                                                    function applyDisplay(wb) {
+                                                        var el = document.getElementById('lp-shipping');
+                                                        if (el) el.style.display = wb ? 'none' : '';
+                                                    }
+                                                    function recalc() {
+                                                        if (!areaEl || !areaEl.value) return;
+                                                        var fd = new FormData();
+                                                        fd.append('_token', csrf);
+                                                        fd.append('area', areaEl.value);
+                                                        fetch(calcUrl, {
+                                                            method: 'POST',
+                                                            headers: {'X-CSRF-TOKEN': csrf, 'Accept': 'application/json'},
+                                                            body: fd
+                                                        })
+                                                        .then(function(r){ return r.json(); })
+                                                        .then(function(res) {
+                                                            if (!res.success) return;
+                                                            isWB = !!res.is_weight_based;
+                                                            var subEl  = document.getElementById('lp-subtotal');
+                                                            var shipEl = document.getElementById('lp-shipping');
+                                                            var totEl  = document.getElementById('lp-total');
+                                                            if (subEl)  subEl.textContent  = fmt(res.subtotal_minor / 100);
+                                                            if (shipEl) shipEl.textContent = fmt(res.shipping_minor / 100);
+                                                            if (totEl)  totEl.textContent  = fmt(res.final_minor / 100);
+                                                            applyDisplay(isWB);
+                                                        })
+                                                        .catch(function(){});
+                                                    }
+                                                    if (areaEl) {
+                                                        areaEl.addEventListener('change', recalc);
+                                                        applyDisplay(isWB);
+                                                        if (areaEl.value) recalc();
+                                                    }
+                                                })();
+                                                </script>
                                             </div>
                                         </div>
                                     </div>

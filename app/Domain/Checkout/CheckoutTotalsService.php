@@ -23,7 +23,8 @@ class CheckoutTotalsService
      *   discount_minor:int,
      *   final_minor:int,
      *   currency:string,
-     *   shipping_charge_id:int
+     *   shipping_charge_id:int,
+     *   is_weight_based:bool
      * }
      */
     public function calculateForShoppingCart(
@@ -93,7 +94,9 @@ class CheckoutTotalsService
             ];
         }
 
-        $newEngineShipping = app(ShippingService::class)->calculateForCart($cartItems, $shippingChargeId);
+        $shippingService = app(ShippingService::class);
+        $isWeightBased = $shippingService->isCartWeightBased($cartItems);
+        $newEngineShipping = $shippingService->calculateForCart($cartItems, $shippingChargeId);
         if ($newEngineShipping !== null) {
             $shippingMinor = $newEngineShipping;
         }
@@ -114,6 +117,7 @@ class CheckoutTotalsService
             'final_minor' => $finalMinor,
             'currency' => $currency,
             'shipping_charge_id' => (int) $shippingCharge->id,
+            'is_weight_based' => $isWeightBased,
         ];
     }
 

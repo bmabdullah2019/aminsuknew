@@ -243,8 +243,8 @@
                                     <span>Subtotal</span>
                                     <strong id="checkout-subtotal" data-minor="{{ $subtotalMinor }}">BDT {{ number_format($subtotalMinor / 100, 2) }}</strong>
                                 </div>
-                                <div>
-                                    <span>Shipping</span>
+                                <div id="checkout-shipping-row">
+                                    <span id="checkout-shipping-label">Shipping</span>
                                     <strong id="checkout-shipping" data-minor="{{ $shippingMinor }}">BDT {{ number_format($shippingMinor / 100, 2) }}</strong>
                                 </div>
                                 <div>
@@ -278,8 +278,11 @@ $(document).ready(function() {
     const $areaSelect = $('select[name="area"]');
     const $subtotalEl = $('#checkout-subtotal');
     const $shippingEl = $('#checkout-shipping');
+    const $shippingRow = $('#checkout-shipping-row');
+    const $shippingLabel = $('#checkout-shipping-label');
     const $discountEl = $('#checkout-discount');
     const $finalEl = $('#checkout-final-total');
+    let currentIsWeightBased = {{ $isWeightBased ? 'true' : 'false' }};
     const moneyFormatter = new Intl.NumberFormat('en-BD', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -294,6 +297,18 @@ $(document).ready(function() {
         return `BDT ${moneyFormatter.format((Math.max(0, minor) / 100))}`;
     }
 
+    function applyWeightBasedSummaryDisplay(isWeightBased) {
+        if (isWeightBased) {
+            // Hide the shipping amount — it is already folded into the grand total
+            $shippingEl.hide();
+            $shippingLabel.text('Shipping');
+        } else {
+            // Fixed shipping: show amount beside label
+            $shippingEl.show();
+            $shippingLabel.text('Shipping');
+        }
+    }
+
     function renderCheckoutTotals(shippingMinor) {
         if (!$shippingEl.length || !$finalEl.length) {
             return;
@@ -306,11 +321,16 @@ $(document).ready(function() {
 
         $shippingEl.data('minor', safeShippingMinor).text(formatMinorToBdt(safeShippingMinor));
         $finalEl.data('minor', finalMinor).text(formatMinorToBdt(finalMinor));
+        applyWeightBasedSummaryDisplay(currentIsWeightBased);
     }
 
     function renderServerTotals(payload) {
         if (!payload || typeof payload !== 'object') {
             return;
+        }
+
+        if (typeof payload.is_weight_based !== 'undefined') {
+            currentIsWeightBased = !!payload.is_weight_based;
         }
 
         if (typeof payload.subtotal_minor !== 'undefined') {
@@ -521,9 +541,11 @@ $(document).ready(function() {
                 var formattedRate = (rateVal % 1 === 0) ? parseInt(rateVal) : rateVal.toFixed(2);
                 
                 if (isWeightBased) {
-                    label = data.name + " - BDT " + formattedRate;
-                } else {
+                    // Weight-based: show only location name, NO amount beside it
                     label = data.name;
+                } else {
+                    // Fixed shipping: show amount beside the location label
+                    label = data.name + " - BDT " + formattedRate;
                 }
                 
                 var option = $('<option></option>')
@@ -547,6 +569,7 @@ $(document).ready(function() {
 
     loadPartialOrder();
     updateShippingDropdown();
+    applyWeightBasedSummaryDisplay(currentIsWeightBased);
     updateCheckoutTotalsFromArea();
     setInterval(savePartialOrder, 10000);
 

@@ -251,6 +251,32 @@ class ShippingService
             ->first();
     }
 
+    // ─── Public Helpers ─────────────────────────────────────────────────
+
+    /**
+     * Returns true if ANY product in the cart uses weight-based shipping.
+     * This is the single source of truth used by checkout, landing page, and POS.
+     *
+     * @param  Collection  $cartItems  Cart items (must have ->id property)
+     */
+    public function isCartWeightBased(Collection $cartItems): bool
+    {
+        if (! $this->hasShippingTypeColumn()) {
+            return false;
+        }
+
+        $productIds = $cartItems->pluck('id')->map(fn ($id) => (int) $id)->unique()->values();
+
+        if ($productIds->isEmpty()) {
+            return false;
+        }
+
+        return Product::query()
+            ->whereIn('id', $productIds)
+            ->where('shipping_type', 'weight_based')
+            ->exists();
+    }
+
     // ─── Legacy Helpers ─────────────────────────────────────────────────
 
     /**
